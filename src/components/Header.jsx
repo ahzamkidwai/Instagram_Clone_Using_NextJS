@@ -17,7 +17,7 @@ import {
 const Header = () => {
   const { data: session } = useSession();
   // console.log("Session is : ", session);
-  // console.log("Data is : ", data);
+  
   return (
     <div className=" shadow-sm border-b stciky top-0 bg-white z-30 p-3">
       <div className="flex items-center justify-between max-w-6xl mx-auto">
