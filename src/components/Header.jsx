@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { signIn, useSession, signOut } from "next-auth/react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -17,23 +17,66 @@ import Modal from "react-modal";
 import { IoIosAddCircleOutline } from "react-icons/io";
 import { HiCamera } from "react-icons/hi";
 import { AiOutlineClose } from "react-icons/ai";
+import { app } from "@/firebase";
+import {
+  getDownloadURL,
+  getStorage,
+  uploadBytesResumable,
+  ref,
+} from "firebase/storage";
+import { ImageUp } from "lucide-react";
 
 const Header = () => {
   const { data: session } = useSession();
   const [isOpen, setIsOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [imageFileUrl, setImageFileUrl] = useState(null);
+  const [imageFileUploading, setImageFileUploading] = useState(false);
   const filePickerRef = useRef(null);
 
   console.log("ImageFileUrl is : ", imageFileUrl);
+  console.log("Selected File is : ", selectedFile);
   function addImageToPost(e) {
     const file = e.target.files[0];
-
     if (file) {
       setSelectedFile(file);
       setImageFileUrl(URL.createObjectURL(file));
     }
   }
+
+  async function uploadImageToStorage() {
+    setImageFileUploading(true);
+    const storage = getStorage(app);
+    const fileName = new Date().getTime() + "-" + selectedFile.name;
+    const storageRef = ref(storage, fileName);
+    const uploadTask = uploadBytesResumable(storageRef, selectedFile);
+    uploadTask.on(
+      "state_changed",
+      (snapshot) => {
+        const progress =
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        console.log("upload is : " + progress + " done");
+      },
+      (error) => {
+        console.log("Error is : ", error);
+        setImageFileUploading(false);
+        setImageFileUrl(null);
+        setSelectedFile(null);
+      },
+      () => {
+        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+          setImageFileUrl(downloadURL);
+          setImageFileUploading(false);
+        });
+      }
+    );
+  }
+
+  useEffect(() => {
+    if (selectedFile) {
+      uploadImageToStorage();
+    }
+  }, [selectedFile]);
 
   return (
     <div className=" shadow-sm border-b stciky top-0 bg-white z-30 p-3">
@@ -103,10 +146,21 @@ const Header = () => {
           ariaHideApp={false}
         >
           <div className="flex flex-col justify-center items-center h-[100%]">
-            <HiCamera
-              onClick={() => filePickerRef.current.click()}
-              className="text-gray-400 text-6xl cursor-pointer"
-            />
+            {selectedFile ? (
+              <img
+                onClick={() => setSelectedFile(null)}
+                src={imageFileUrl}
+                alt="Selected File"
+                className={`w-full max-h-[250px] object-cover cursor-pointer ${
+                  imageFileUploading ? "animate-pulse" : ""
+                }`}
+              />
+            ) : (
+              <HiCamera
+                onClick={() => filePickerRef.current.click()}
+                className="text-gray-400 text-6xl cursor-pointer"
+              />
+            )}
             <input
               hidden
               ref={filePickerRef}
