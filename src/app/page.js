@@ -1,7 +1,12 @@
+import Feed from "@/components/Feed";
 import React from "react";
 
 const HomePage = () => {
-  return <div>HomePage</div>;
+  return (
+    <>
+      <Feed />
+    </>
+  );
 };
 
 export default HomePage;
