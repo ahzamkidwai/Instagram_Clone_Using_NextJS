@@ -24,15 +24,25 @@ import {
   uploadBytesResumable,
   ref,
 } from "firebase/storage";
-import { ImageUp } from "lucide-react";
+import {
+  Timestamp,
+  addDoc,
+  collection,
+  getFirestore,
+  serverTimestamp,
+} from "firebase/firestore";
 
 const Header = () => {
   const { data: session } = useSession();
+  console.log("Session is : ", session);
   const [isOpen, setIsOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [imageFileUrl, setImageFileUrl] = useState(null);
   const [imageFileUploading, setImageFileUploading] = useState(false);
+  const [postUploading, setPostUploading] = useState(false);
+  const [caption, setCaption] = useState("");
   const filePickerRef = useRef(null);
+  const db = getFirestore(app);
 
   console.log("ImageFileUrl is : ", imageFileUrl);
   console.log("Selected File is : ", selectedFile);
@@ -70,6 +80,19 @@ const Header = () => {
         });
       }
     );
+  }
+
+  async function handleSubmit() {
+    setPostUploading(true);
+    const docRef = await addDoc(collection(db, "posts"), {
+      username: session.user.username,
+      caption: caption,
+      profileImg: session.user.image,
+      image: imageFileUrl,
+      timestamp: serverTimestamp(),
+    });
+    setPostUploading(false);
+    setIsOpen(false);
   }
 
   useEffect(() => {
@@ -173,11 +196,13 @@ const Header = () => {
               maxLength={150}
               placeholder="Enter Caption..."
               className="m-4  text-center w-full focus:ring-0 border-none outline-none"
+              onChange={(e) => setCaption(e.target.value)}
             />
           </div>
           <button
-            disabled
+            disabled={!selectedFile || caption.trim()===''||postUploading||imageFileUploading}
             className="w-full bg-red-500 text-white p-2 shadow-md rounded-lg hover:brightness-105 disabled:bg-gray-200 disabled:cursor-not-allowed disabled:hover:brightness-100"
+            onClick={handleSubmit}
           >
             Upload Post
           </button>
