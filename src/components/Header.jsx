@@ -93,6 +93,7 @@ const Header = () => {
     });
     setPostUploading(false);
     setIsOpen(false);
+    location.reload();
   }
 
   useEffect(() => {
@@ -200,7 +201,12 @@ const Header = () => {
             />
           </div>
           <button
-            disabled={!selectedFile || caption.trim()===''||postUploading||imageFileUploading}
+            disabled={
+              !selectedFile ||
+              caption.trim() === "" ||
+              postUploading ||
+              imageFileUploading
+              }
             className="w-full bg-red-500 text-white p-2 shadow-md rounded-lg hover:brightness-105 disabled:bg-gray-200 disabled:cursor-not-allowed disabled:hover:brightness-100"
             onClick={handleSubmit}
           >

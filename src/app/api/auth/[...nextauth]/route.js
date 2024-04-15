@@ -17,7 +17,6 @@ const handler = NextAuth({
         .join("")
         .toLocaleLowerCase();
       session.user.uid = token.sub;
-
       return session;
     },
   },
