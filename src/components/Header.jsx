@@ -31,6 +31,8 @@ import {
   getFirestore,
   serverTimestamp,
 } from "firebase/firestore";
+import { CiSearch } from "react-icons/ci";
+import { FaSearch } from "react-icons/fa";
 
 const Header = () => {
   const { data: session } = useSession();
@@ -120,11 +122,16 @@ const Header = () => {
           </Link>
         </div>
 
-        <input
-          type="text"
-          placeholder="Search"
-          className="bg-gray-50 border border-gray-200 rounded text-sm w-full py-2 px-4 max-w-[210px] focus:border-gray-500 focus:outline-none"
-        />
+        <div className="relative flex justify-center items-center">
+          <input
+            type="text"
+            placeholder="Search"
+            className="bg-gray-50 border border-gray-200 rounded text-sm w-full py-2 px-4 pl-10 max-w-[210px] focus:border-gray-500 focus:outline-none"
+          />
+          <div className="absolute inset-y-0 left-0 flex items-center pl-3 cursor-pointer">
+            <FaSearch className="text-gray-400" />
+          </div>
+        </div>
 
         {session ? (
           <div>
@@ -206,7 +213,7 @@ const Header = () => {
               caption.trim() === "" ||
               postUploading ||
               imageFileUploading
-              }
+            }
             className="w-full bg-red-500 text-white p-2 shadow-md rounded-lg hover:brightness-105 disabled:bg-gray-200 disabled:cursor-not-allowed disabled:hover:brightness-100"
             onClick={handleSubmit}
           >
