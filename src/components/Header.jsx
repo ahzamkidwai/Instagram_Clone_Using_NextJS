@@ -48,6 +48,8 @@ const Header = () => {
 
   console.log("ImageFileUrl is : ", imageFileUrl);
   console.log("Selected File is : ", selectedFile);
+  console.log("Session is (inside Header.jsx) : ", session);
+
   function addImageToPost(e) {
     const file = e.target.files[0];
     if (file) {
@@ -96,6 +98,16 @@ const Header = () => {
     setPostUploading(false);
     setIsOpen(false);
     location.reload();
+  }
+
+  function capitalizeName(name) {
+    
+    const words = name.toLowerCase().split(" ");
+    const capitalizedWords = words.map(
+      (word) => word.charAt(0).toUpperCase() + word.slice(1)
+    );
+    const capitalizedName = capitalizedWords.join(" ");
+    return capitalizedName;
   }
 
   useEffect(() => {
@@ -149,7 +161,9 @@ const Header = () => {
                 </DropdownMenuTrigger>
               </div>
               <DropdownMenuContent>
-                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuLabel>
+                  {capitalizeName(session.user.name)}
+                </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem className="cursor-pointer">
                   Profile
